@@ -33,6 +33,7 @@ html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
   --surface: #ffffff;
   --scrim: rgba(30, 24, 38, .45);
   --note: #5a8f1c;
+  --period: #d12d4a;
   --w0: #cf3a98; --w1: #7a4fd0; --w2: #0f857d; --w3: #c5630e; --w4: #2c6bd3; --w5: #b3303f;
   --hand: "Caveat", "Bradley Hand", "Segoe Script", cursive;
   --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -41,7 +42,7 @@ html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
   :root:not([data-theme="light"]) {
     --bg: #17151b; --fg: #ece9f0; --muted: #96909f; --line: #34303b; --cell: #1f1c24;
     --cell-off: #17151b; --today: #223356; --today-ring: #7fa6f5; --surface: #24212a;
-    --scrim: rgba(0, 0, 0, .6); --note: #9fd35a;
+    --scrim: rgba(0, 0, 0, .6); --note: #9fd35a; --period: #ff7a90;
     --w0: #f277c0; --w1: #b094f5; --w2: #4fcfc4; --w3: #f0a257; --w4: #7fadf7; --w5: #f2808c;
     color-scheme: dark;
   }
@@ -49,7 +50,7 @@ html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
 :root[data-theme="dark"] {
   --bg: #17151b; --fg: #ece9f0; --muted: #96909f; --line: #34303b; --cell: #1f1c24;
   --cell-off: #17151b; --today: #223356; --today-ring: #7fa6f5; --surface: #24212a;
-  --scrim: rgba(0, 0, 0, .6); --note: #9fd35a;
+  --scrim: rgba(0, 0, 0, .6); --note: #9fd35a; --period: #ff7a90;
   --w0: #f277c0; --w1: #b094f5; --w2: #4fcfc4; --w3: #f0a257; --w4: #7fadf7; --w5: #f2808c;
   color-scheme: dark;
 }
@@ -91,6 +92,12 @@ h1 span { color: var(--muted); font-weight: 400; }
   min-height: 74px; padding: 5px 3px 6px; border: 0; border-radius: 0; background: var(--cell);
   display: flex; flex-direction: column; align-items: stretch; gap: 1px; text-align: left; min-width: 0;
 }
+.day { position: relative; }
+.dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--period); }
+.day.out .dot { opacity: .5; }
+.pd { color: var(--period); }
+.export { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
+.export span { color: var(--muted); font-size: 13px; }
 .day.off { background: var(--cell-off); }
 .day.out .num { opacity: .55; }
 .day.out .tag, .day.out .note { opacity: .5; }
@@ -168,6 +175,11 @@ h1 span { color: var(--muted); font-weight: 400; }
   </div>
 
   <div class="summary" id="summary"></div>
+
+  <div class="export">
+    <button class="btn" id="exportBtn">Export data (CSV)</button>
+    <span id="exportMsg" role="status">Dates, exercises, notes and period days, for a spreadsheet.</span>
+  </div>
 </div>
 
 <div class="backdrop" id="backdrop" hidden>
@@ -182,6 +194,10 @@ h1 span { color: var(--muted); font-weight: 400; }
       <input class="field" id="newType" maxlength="14" placeholder="New workout, e.g. yoga" autocomplete="off" aria-label="New workout name">
       <button class="btn" type="submit">Add</button>
     </form>
+    <div class="sub"><span>Period</span></div>
+    <button class="type pd" type="button" id="periodBtn" aria-pressed="false" style="flex:none">
+      <span class="name">period day</span><span class="state" id="periodState"></span>
+    </button>
     <div class="sub"><span>Note</span></div>
     <input class="field" id="note" maxlength="14" placeholder="e.g. go!, rest, finish!" autocomplete="off" aria-label="Note for this day" style="flex:none">
   </div>
@@ -241,7 +257,7 @@ h1 span { color: var(--muted); font-weight: 400; }
     var first = new Date(view.y, view.m, 1);
     var lead = (first.getDay() + 6) % 7;                       // Monday-first offset
     var total = Math.ceil((lead + new Date(view.y, view.m + 1, 0).getDate()) / 7) * 7;
-    var todayKey = keyOf(new Date()), counts = {};
+    var todayKey = keyOf(new Date()), counts = {}, periodDays = 0;
 
     for (var i = 0; i < total; i++) {
       var dt = new Date(view.y, view.m, 1 - lead + i), k = keyOf(dt), entry = state.days[k];
@@ -251,12 +267,13 @@ h1 span { color: var(--muted); font-weight: 400; }
       b.append(el('span', 'num', dt.getDate()));
       var label = dt.toDateString();
       if (entry) {
+        if (entry.p) { b.append(el('span', 'dot')); if (inMonth) periodDays++; }
         if (entry.note) b.append(el('span', 'note', entry.note));
         (entry.w || []).forEach(function (w) {
           b.append(el('span', 'tag ' + colorOf(w), w));
           if (inMonth) counts[w] = (counts[w] || 0) + 1;
         });
-        label += ': ' + (entry.w || []).concat(entry.note ? [entry.note] : []).join(', ');
+        label += ': ' + (entry.w || []).concat(entry.note ? [entry.note] : [], entry.p ? ['period day'] : []).join(', ');
       }
       b.setAttribute('aria-label', label);
       grid.append(b);
@@ -265,12 +282,17 @@ h1 span { color: var(--muted); font-weight: 400; }
     var sum = $('summary'); sum.innerHTML = '';
     sum.append(el('span', 'label', 'This month'));
     var names = Object.keys(counts);
-    if (!names.length) sum.append(el('span', 'empty', 'No workouts yet. Tap a day to add one.'));
+    if (!names.length && !periodDays) sum.append(el('span', 'empty', 'Nothing logged yet. Tap a day to add a workout.'));
     names.forEach(function (n) {
       var s = el('span', 'stat ' + colorOf(n), n);
       s.append(el('b', '', '× ' + counts[n]));
       sum.append(s);
     });
+    if (periodDays) {
+      var ps = el('span', 'stat pd', 'period days');
+      ps.append(el('b', '', '× ' + periodDays));
+      sum.append(ps);
+    }
   }
 
   function renderSheet() {
@@ -295,13 +317,15 @@ h1 span { color: var(--muted); font-weight: 400; }
       }
       box.append(row);
     });
+    $('periodBtn').setAttribute('aria-pressed', !!entry.p);
+    $('periodState').textContent = entry.p ? '✓ Marked · tap to remove' : 'Tap to mark';
     $('editList').textContent = editing ? 'Finish editing' : 'Edit list';
     $('editList').hidden = !state.types.length;
   }
 
   function touch() { state.sample = false; save(); render(); }
   function entryFor(k) { return state.days[k] || (state.days[k] = { w: [] }); }
-  function prune(k) { var e = state.days[k]; if (e && !(e.w && e.w.length) && !e.note) delete state.days[k]; }
+  function prune(k) { var e = state.days[k]; if (e && !(e.w && e.w.length) && !e.note && !e.p) delete state.days[k]; }
 
   function openSheet(k) {
     openKey = k; editing = false;
@@ -350,6 +374,45 @@ h1 span { color: var(--muted); font-weight: 400; }
     if (v) en.note = v; else delete en.note;
     prune(openKey); touch();
   });
+  $('periodBtn').addEventListener('click', function () {
+    var en = entryFor(openKey);
+    if (en.p) delete en.p; else en.p = true;
+    prune(openKey); touch(); renderSheet();
+  });
+
+  // Export: one CSV row per logged day.
+  var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function csvCell(v) { v = String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function buildCsv() {
+    var keys = Object.keys(state.days).sort(), rows = [['date', 'weekday', 'exercises', 'note', 'period']];
+    keys.forEach(function (k) {
+      var e = state.days[k], p = k.split('-');
+      rows.push([k, WEEKDAYS[new Date(+p[0], +p[1] - 1, +p[2]).getDay()], (e.w || []).join('; '), e.note || '', e.p ? 'yes' : 'no']);
+    });
+    return { text: rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n') + '\r\n', count: keys.length };
+  }
+  function download(blob, name) {
+    var a = document.createElement('a'), url = URL.createObjectURL(blob);
+    a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+  }
+  $('exportBtn').addEventListener('click', function () {
+    var csv = buildCsv(), msg = $('exportMsg');
+    if (!csv.count) { msg.textContent = 'Nothing to export yet. Log a day first.'; return; }
+    var name = 'workout-calendar-' + keyOf(new Date()) + '.csv';
+    var done = function () { msg.textContent = 'Exported ' + csv.count + (csv.count === 1 ? ' day' : ' days') + ' as ' + name + '.'; };
+    var file = null;
+    try { file = new File([csv.text], name, { type: 'text/csv' }); } catch (e) {}
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Workout Calendar export' }).then(done, function (err) {
+        if (err && err.name === 'AbortError') return;        // person closed the share sheet
+        download(file, name); done();
+      });
+    } else {
+      download(new Blob([csv.text], { type: 'text/csv' }), name); done();
+    }
+  });
+
   $('editList').addEventListener('click', function () { editing = !editing; renderSheet(); });
   $('done').addEventListener('click', closeSheet);
   $('backdrop').addEventListener('click', function (e) { if (e.target === $('backdrop')) closeSheet(); });
