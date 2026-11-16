@@ -5,10 +5,10 @@ A simple workout and period tracker for phones. It is a single web page that wor
 ## Features
 
 - Monthly calendar, Monday first. Tap a day to add or remove workouts.
-- Your own workout list (starts with "gym" and "gravity").
-- Mark period days and add a short note per day.
+- Your own workout list (starts with strength, pilates, yoga, gravity, walking and rest, each with its own icon).
+- Mark period days and add a note per day.
 - Monthly count per workout and of period days.
-- Export everything as a CSV file (date, weekday, exercises, note, period).
+- Export a date range as a CSV file (date, weekday, exercises, note, period): this week, this month, this year, previous year, all time, or custom dates.
 
 ## Use it on a phone
 
@@ -39,4 +39,4 @@ When you change any file, bump `VERSION` in `sw.js` so phones drop the old offli
 - `index.html`: the whole app (markup, styles, script)
 - `sw.js`: offline support
 - `manifest.webmanifest`, `icons/`: home-screen install
-- `fonts/`: bundled Caveat and Inter (SIL Open Font License)
+- `fonts/`: bundled DM Sans and Cormorant Garamond (SIL Open Font License)

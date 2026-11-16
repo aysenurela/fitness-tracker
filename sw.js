@@ -1,12 +1,12 @@
 // Offline support: keep a copy of the app on the device.
 // Bump VERSION whenever a file changes so phones pick up the new copy.
-const VERSION = 'v3';
+const VERSION = 'v5';
 const CACHE = 'workout-calendar-' + VERSION;
 const FILES = [
   './',
   'manifest.webmanifest',
-  'fonts/caveat.woff2',
-  'fonts/inter.woff2',
+  'fonts/dm-sans.woff2',
+  'fonts/cormorant-italic.woff2',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png'

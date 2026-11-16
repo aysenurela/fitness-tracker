@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0;font-size:14px}[hidden]{display:none!important}</style>
 <title>Workout Calendar</title>
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#17151b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf6f1">
+<meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Workouts">
@@ -14,140 +14,149 @@
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
-@font-face { font-family: "Caveat"; font-weight: 600 700; font-display: swap; src: url(fonts/caveat.woff2) format("woff2"); }
-@font-face { font-family: "Inter"; font-weight: 400 600; font-display: swap; src: url(fonts/inter.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-weight: 400 700; font-display: swap; src: url(fonts/dm-sans.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 500; font-display: swap; src: url(fonts/cormorant-italic.woff2) format("woff2"); }
 html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
 </style>
 <style>
-/* Layout: a paper wall-planner. Full-width 7-column month grid (Monday first), handwritten
-   workout labels inside each day, a bottom sheet for editing the tapped day. */
+/* Layout: a soft, milky planner page. Serif-italic month title, a rounded 7-column month grid
+   (Monday first) with a small line icon and label per workout, and a bottom sheet
+   for editing the tapped day. */
 :root {
-  --bg: #ffffff;
-  --fg: #2a2630;
-  --muted: #8d8894;
-  --line: #e2dfe6;
-  --cell: #ffffff;
-  --cell-off: #f1eff3;      /* days outside the month */
-  --today: #dce8ff;
-  --today-ring: #5b8def;
-  --surface: #ffffff;
-  --scrim: rgba(30, 24, 38, .45);
-  --note: #5a8f1c;
-  --period: #d12d4a;
-  --w0: #cf3a98; --w1: #7a4fd0; --w2: #0f857d; --w3: #c5630e; --w4: #2c6bd3; --w5: #b3303f;
-  --hand: "Caveat", "Bradley Hand", "Segoe Script", cursive;
-  --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;         /* one look only: no dark mode */
+  --bg: #faf6f1;            /* milk */
+  --fg: #4b403a;            /* cocoa */
+  --muted: #a5978c;
+  --line: #ece3d9;
+  --cell: #fffdfa;
+  --cell-off: #f6f0e9;      /* days outside the month */
+  --today: #fbe9e6;         /* blush */
+  --today-ring: #d9958f;
+  --surface: #fffdfa;
+  --scrim: rgba(75, 64, 58, .38);
+  --note: #7f8c56;
+  --period: #d9697a;
+  --w0: #b9606c; --w1: #8a6c99; --w2: #5f8259; --w3: #a8733f; --w4: #5d7fa0; --w5: #8f7d74;
+  --display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --ui: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #17151b; --fg: #ece9f0; --muted: #96909f; --line: #34303b; --cell: #1f1c24;
-    --cell-off: #17151b; --today: #223356; --today-ring: #7fa6f5; --surface: #24212a;
-    --scrim: rgba(0, 0, 0, .6); --note: #9fd35a; --period: #ff7a90;
-    --w0: #f277c0; --w1: #b094f5; --w2: #4fcfc4; --w3: #f0a257; --w4: #7fadf7; --w5: #f2808c;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #17151b; --fg: #ece9f0; --muted: #96909f; --line: #34303b; --cell: #1f1c24;
-  --cell-off: #17151b; --today: #223356; --today-ring: #7fa6f5; --surface: #24212a;
-  --scrim: rgba(0, 0, 0, .6); --note: #9fd35a; --period: #ff7a90;
-  --w0: #f277c0; --w1: #b094f5; --w2: #4fcfc4; --w3: #f0a257; --w4: #7fadf7; --w5: #f2808c;
-  color-scheme: dark;
-}
-
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--fg); font-family: var(--ui); -webkit-tap-highlight-color: transparent; }
-button, input { font: inherit; color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--today-ring); outline-offset: 2px; }
+.ico { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .app {
-  max-width: 720px; margin: 0 auto; padding-block: 16px 32px;
+  max-width: 720px; margin: 0 auto; padding-block: 20px 36px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: flex; flex-direction: column; gap: 14px;
+  display: flex; flex-direction: column; gap: 16px;
 }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
-h1 span { color: var(--muted); font-weight: 400; }
+h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 34px; line-height: 1; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 8px; }
+h1 span { font-family: var(--ui); font-style: normal; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .12em; }
+h1 .ico { font-size: 14px; color: var(--today-ring); fill: currentColor; stroke: none; align-self: center; }
 .nav { display: flex; gap: 6px; }
 .btn {
-  min-height: 40px; min-width: 40px; padding: 0 12px; border-radius: 10px;
-  border: 1px solid var(--line); background: var(--surface); font-weight: 500;
+  min-height: 40px; min-width: 40px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 13px;
 }
 .btn:active { background: var(--cell-off); }
-.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); padding: 0 18px; }
 
 .banner {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  padding: 8px 12px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: 13px;
+  padding: 8px 14px; background: var(--cell-off); border-radius: 16px; color: var(--muted); font-size: 13px;
 }
-.link { background: none; border: 0; padding: 6px 0; color: var(--fg); font-weight: 600; text-decoration: underline; }
+.link { background: none; border: 0; padding: 6px 0; color: var(--fg); font-weight: 700; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--today-ring); }
 
-.cal { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cal { border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: var(--cell); }
 .dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.dow div { padding: 8px 0; text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.dow div { padding: 10px 0 8px; text-align: center; font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; }
 .grid { gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
 .day {
-  min-height: 74px; padding: 5px 3px 6px; border: 0; border-radius: 0; background: var(--cell);
-  display: flex; flex-direction: column; align-items: stretch; gap: 1px; text-align: left; min-width: 0;
+  position: relative; min-height: 78px; padding: 5px 2px 7px; border: 0; border-radius: 0; background: var(--cell);
+  display: flex; flex-direction: column; align-items: stretch; gap: 3px; text-align: left; min-width: 0;
 }
-.day { position: relative; }
-.dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--period); }
-.day.out .dot { opacity: .5; }
-.pd { color: var(--period); }
-.export { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 14px; }
-.export span { color: var(--muted); font-size: 13px; }
 .day.off { background: var(--cell-off); }
 .day.out .num { opacity: .55; }
-.day.out .tag, .day.out .note { opacity: .5; }
-.day.today { background: var(--today); box-shadow: inset 0 0 0 2px var(--today-ring); }
-.num { font-size: 12px; color: var(--muted); padding-left: 3px; font-variant-numeric: tabular-nums; }
-.today .num { color: var(--fg); font-weight: 600; }
-.tag, .note {
-  font-family: var(--hand); font-weight: 700; font-size: 17px; line-height: .95;
-  text-align: center; overflow-wrap: anywhere; transform: rotate(-4deg);
+.day.out .tag, .day.out .note, .day.out .dot { opacity: .5; }
+.day.today { background: var(--today); }
+.num { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; align-self: flex-start; min-width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 999px; margin-left: 1px; }
+.today .num { background: var(--today-ring); color: var(--cell); font-weight: 700; }
+.dot { position: absolute; top: 9px; right: 6px; display: flex; font-size: 11px; color: var(--period); }
+.dot .ico, .pd .ico { fill: currentColor; stroke: none; }
+.tag { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tag .ico { font-size: 19px; }
+.tag .txt { font-size: 10.5px; font-weight: 600; line-height: 1.1; text-align: center; overflow-wrap: anywhere; max-width: 100%; }
+.note {
+  font-family: var(--display); font-style: italic; font-size: 14px; line-height: 1; color: var(--note); text-align: center;
+  overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
 }
-.note { color: var(--note); transform: rotate(-2deg); font-size: 18px; }
-@media (min-width: 560px) { .day { min-height: 96px; padding: 7px 6px 8px; } .tag, .note { font-size: 22px; } .num { font-size: 13px; } }
+@media (min-width: 560px) {
+  .day { min-height: 104px; padding: 7px 6px 9px; }
+  .tag .ico { font-size: 24px; } .tag .txt { font-size: 13px; } .note { font-size: 17px; } .num { font-size: 12px; }
+}
 
-.summary { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
-.summary .label { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; width: 100%; }
-.stat { font-family: var(--hand); font-size: 24px; font-weight: 700; }
-.stat b { font-family: var(--ui); font-size: 15px; font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; margin-left: 4px; }
+.summary { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; width: 100%; }
+.stat { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 10px; border-radius: 999px; background: var(--cell); border: 1px solid var(--line); font-size: 13px; font-weight: 600; line-height: 1.7; }
+.stat .ico { font-size: 17px; }
+.stat b { font-size: 12px; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
 .empty { color: var(--muted); }
+.pd { color: var(--period); }
+.export { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; }
+.export .row { align-items: flex-end; }
+.date { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.date .field { flex: none; width: 100%; -webkit-appearance: none; appearance: none; color: var(--fg); }
+select.field {
+  flex: none; width: 100%; -webkit-appearance: none; appearance: none; padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a5978c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 18px;
+}
+.export-go { align-items: center !important; flex-wrap: wrap; }
+.export-go span { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; }
 
 .backdrop { position: fixed; inset: 0; background: var(--scrim); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
 .sheet {
   width: 100%; max-width: 520px; max-height: 88%; overflow-y: auto; background: var(--surface);
-  border-radius: 18px 18px 0 0; display: flex; flex-direction: column; gap: 14px;
-  padding-top: 16px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 14px;
+  padding-top: 10px;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
 }
+.sheet::before { content: ""; align-self: center; flex: none; width: 36px; height: 4px; border-radius: 999px; background: var(--line); }
 @media (prefers-reduced-motion: no-preference) {
-  .sheet { animation: up .18s ease-out; }
+  .sheet { animation: up .2s ease-out; }
   @keyframes up { from { transform: translateY(24px); opacity: .6; } }
 }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.sheet h2 { margin: 0; font-size: 18px; font-weight: 600; }
-.sub { font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+.sheet h2 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 26px; line-height: 1.1; }
+.sub { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; min-height: 20px; }
+.sub .link { text-transform: none; letter-spacing: 0; padding: 0; }
 .types { display: flex; flex-direction: column; gap: 8px; }
-.type-row { display: flex; gap: 8px; }
+.type-row { display: flex; gap: 8px; align-items: center; }
 .type {
-  flex: 1; min-width: 0; min-height: 48px; padding: 4px 14px; border-radius: 12px; border: 1px solid var(--line);
+  flex: 1; min-width: 0; min-height: 50px; padding: 4px 16px 4px 14px; border-radius: 18px; border: 1px solid var(--line);
   background: var(--bg); display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
-.type .name { font-family: var(--hand); font-size: 26px; font-weight: 700; overflow-wrap: anywhere; text-align: left; }
-.type .state { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.type[aria-pressed="true"] { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
-.type[aria-pressed="true"] .state { color: var(--fg); font-weight: 600; }
+.type .name { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; text-align: left; min-width: 0; }
+.type .name .ico { font-size: 22px; }
+.type .state { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.type[aria-pressed="true"] { border-color: currentColor; background: var(--surface); box-shadow: inset 0 0 0 1px currentColor; }
+@supports (background: color-mix(in srgb, red 10%, white)) {
+  .type[aria-pressed="true"] { background: color-mix(in srgb, currentColor 9%, var(--surface)); box-shadow: none; }
+}
+.type[aria-pressed="true"] .state { color: var(--fg); }
 .row { display: flex; gap: 8px; }
 .field {
-  flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line);
+  flex: 1; min-width: 0; min-height: 46px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--bg); font-size: 16px;
 }
+.field::placeholder { color: var(--muted); }
+textarea.field { flex: none; border-radius: 18px; padding: 12px 16px; resize: none; line-height: 1.4; }
 .c0 { color: var(--w0); } .c1 { color: var(--w1); } .c2 { color: var(--w2); }
 .c3 { color: var(--w3); } .c4 { color: var(--w4); } .c5 { color: var(--w5); }
 </style>
@@ -177,8 +186,23 @@ h1 span { color: var(--muted); font-weight: 400; }
   <div class="summary" id="summary"></div>
 
   <div class="export">
-    <button class="btn" id="exportBtn">Export data (CSV)</button>
-    <span id="exportMsg" role="status">Dates, exercises, notes and period days, for a spreadsheet.</span>
+    <span class="label">Export</span>
+    <select class="field" id="range" aria-label="Date range to export">
+      <option value="week">This week</option>
+      <option value="month" selected>This month</option>
+      <option value="year">This year</option>
+      <option value="lastyear">Previous year</option>
+      <option value="all">All time</option>
+      <option value="custom">Custom dates</option>
+    </select>
+    <div class="row">
+      <label class="date">From<input class="field" type="date" id="from"></label>
+      <label class="date">To<input class="field" type="date" id="to"></label>
+    </div>
+    <div class="row export-go">
+      <button class="btn primary" id="exportBtn">Export CSV</button>
+      <span id="exportMsg" role="status"></span>
+    </div>
   </div>
 </div>
 
@@ -191,15 +215,15 @@ h1 span { color: var(--muted); font-weight: 400; }
     <div class="sub"><span>Workouts</span><button class="link" id="editList">Edit list</button></div>
     <div class="types" id="types"></div>
     <form class="row" id="addForm">
-      <input class="field" id="newType" maxlength="14" placeholder="New workout, e.g. yoga" autocomplete="off" aria-label="New workout name">
+      <input class="field" id="newType" maxlength="14" placeholder="New workout, e.g. barre" autocomplete="off" aria-label="New workout name">
       <button class="btn" type="submit">Add</button>
     </form>
     <div class="sub"><span>Period</span></div>
     <button class="type pd" type="button" id="periodBtn" aria-pressed="false" style="flex:none">
-      <span class="name">period day</span><span class="state" id="periodState"></span>
+      <span class="name"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C6.5 16.5 3 13.3 3 9.3C3 6.5 5.1 4.5 7.6 4.5c1.8 0 3.4 1 4.4 2.6c1-1.6 2.6-2.6 4.4-2.6C18.9 4.5 21 6.5 21 9.3c0 4-3.5 7.2-9 11.2z"/></svg>period day</span><span class="state" id="periodState"></span>
     </button>
     <div class="sub"><span>Note</span></div>
-    <input class="field" id="note" maxlength="14" placeholder="e.g. go!, rest, finish!" autocomplete="off" aria-label="Note for this day" style="flex:none">
+    <textarea class="field" id="note" rows="2" maxlength="300" placeholder="How did it go? e.g. felt strong, slept badly" aria-label="Note for this day"></textarea>
   </div>
 </div>
 
@@ -215,17 +239,35 @@ h1 span { color: var(--muted); font-weight: 400; }
   var view = { y: now.getFullYear(), m: now.getMonth() };
   var openKey = null, editing = false;
 
+  // Line icons, drawn on a 24px grid. Workouts are matched by name; anything else gets the sparkle.
+  var DEFAULT_TYPES = ['strength', 'pilates', 'yoga', 'gravity', 'walking', 'rest'];
+  var ICONS = {
+    strength: '<path d="M3 9.5v5M6.5 7v10M17.5 7v10M21 9.5v5M6.5 12h11"/>',
+    pilates: '<circle cx="12" cy="12" r="6.5"/><path d="M3 10v4M21 10v4"/><path d="M9 12.5c1 1.6 5 1.6 6 0"/>',
+    yoga: '<path d="M12 4.5c2.4 2.8 2.4 7.6 0 10.5c-2.4-2.9-2.4-7.7 0-10.5z"/><path d="M9.6 8.3c-2.2-.5-4.2 0-5.6.3c.3 4.8 4.6 7.8 8 6.4"/><path d="M14.4 8.3c2.2-.5 4.2 0 5.6.3c-.3 4.8-4.6 7.8-8 6.4"/><path d="M7 19.5h10"/>',
+    gravity: '<path d="M4 4h16"/><path d="M7 4c0 8.5 1.8 13 5 13s5-4.5 5-13"/><path d="M9.5 4c0 5 .8 8 2.5 8s2.5-3 2.5-8"/><path d="M12 19.9v.1"/>',
+    walking: '<path d="M3 18.5h18v-.8c0-1.6-1.7-2.3-4.3-2.7c-2.9-.4-4.6-1.1-5.8-2.5L8.2 9.2c-.8 1.3-2.8 1.8-5.2.6z"/><path d="M3 16.3h16"/><path d="M9.8 11.3l1.3-1M11.5 13.1l1.3-1"/>',
+    rest: '<path d="M5 10h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.3a2.3 2.3 0 0 1 0 4.6h-1.6"/><path d="M8.5 4c-.9 1.1.9 1.9 0 3M12.5 4c-.9 1.1.9 1.9 0 3"/>',
+    sparkle: '<path d="M12 5c.5 3.7 3.3 6.5 7 7c-3.7.5-6.5 3.3-7 7c-.5-3.7-3.3-6.5-7-7c3.7-.5 6.5-3.3 7-7z"/>',
+    heart: '<path d="M12 20.5C6.5 16.5 3 13.3 3 9.3C3 6.5 5.1 4.5 7.6 4.5c1.8 0 3.4 1 4.4 2.6c1-1.6 2.6-2.6 4.4-2.6C18.9 4.5 21 6.5 21 9.3c0 4-3.5 7.2-9 11.2z"/>'
+  };
+  ICONS.gym = ICONS.strength; ICONS.walk = ICONS.walking; ICONS['rest day'] = ICONS.rest;
+  function icon(name) {
+    var t = document.createElement('template');
+    t.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.sparkle) + '</svg>';
+    return t.content.firstChild;
+  }
+
   function sample() {
+    var plan = { 1: 'strength', 2: 'pilates', 3: 'rest', 4: 'yoga', 5: 'gravity', 0: 'walking' };
     var days = {}, y = now.getFullYear(), m = now.getMonth(), n = new Date(y, m + 1, 0).getDate(), first = true;
     for (var d = 1; d <= n; d++) {
-      var dt = new Date(y, m, d), wd = dt.getDay(), w = null;
-      if (wd === 1 || wd === 4 || wd === 6) w = 'gym';
-      if (wd === 2 || wd === 5) w = 'gravity';
+      var dt = new Date(y, m, d), w = plan[dt.getDay()];
       if (!w) continue;
       days[keyOf(dt)] = { w: [w] };
       if (first) { days[keyOf(dt)].note = 'go!'; first = false; }
     }
-    return { types: [{ name: 'gym', c: 0 }, { name: 'gravity', c: 1 }], days: days, sample: true };
+    return { types: DEFAULT_TYPES.map(function (n, i) { return { name: n, c: i }; }), days: days, sample: true };
   }
   function load() {
     try {
@@ -250,7 +292,7 @@ h1 span { color: var(--muted); font-weight: 400; }
 
   function render() {
     $('monthTitle').innerHTML = '';
-    $('monthTitle').append(MONTHS[view.m] + ' ', el('span', '', view.y));
+    $('monthTitle').append(MONTHS[view.m], el('span', '', view.y), icon('sparkle'));
     $('sampleBanner').hidden = !state.sample;
 
     var grid = $('grid'); grid.innerHTML = '';
@@ -267,10 +309,10 @@ h1 span { color: var(--muted); font-weight: 400; }
       b.append(el('span', 'num', dt.getDate()));
       var label = dt.toDateString();
       if (entry) {
-        if (entry.p) { b.append(el('span', 'dot')); if (inMonth) periodDays++; }
+        if (entry.p) { var dot = el('span', 'dot'); dot.append(icon('heart')); b.append(dot); if (inMonth) periodDays++; }
         if (entry.note) b.append(el('span', 'note', entry.note));
         (entry.w || []).forEach(function (w) {
-          b.append(el('span', 'tag ' + colorOf(w), w));
+          var tag = el('span', 'tag ' + colorOf(w)); tag.append(icon(w), el('span', 'txt', w)); b.append(tag);
           if (inMonth) counts[w] = (counts[w] || 0) + 1;
         });
         label += ': ' + (entry.w || []).concat(entry.note ? [entry.note] : [], entry.p ? ['period day'] : []).join(', ');
@@ -284,12 +326,12 @@ h1 span { color: var(--muted); font-weight: 400; }
     var names = Object.keys(counts);
     if (!names.length && !periodDays) sum.append(el('span', 'empty', 'Nothing logged yet. Tap a day to add a workout.'));
     names.forEach(function (n) {
-      var s = el('span', 'stat ' + colorOf(n), n);
+      var s = el('span', 'stat ' + colorOf(n)); s.append(icon(n), n);
       s.append(el('b', '', '× ' + counts[n]));
       sum.append(s);
     });
     if (periodDays) {
-      var ps = el('span', 'stat pd', 'period days');
+      var ps = el('span', 'stat pd'); ps.append(icon('heart'), 'period days');
       ps.append(el('b', '', '× ' + periodDays));
       sum.append(ps);
     }
@@ -308,7 +350,8 @@ h1 span { color: var(--muted); font-weight: 400; }
       var on = (entry.w || []).indexOf(n) >= 0, row = el('div', 'type-row');
       var b = el('button', 'type ' + colorOf(n));
       b.type = 'button'; b.dataset.name = n; b.setAttribute('aria-pressed', on);
-      b.append(el('span', 'name', n), el('span', 'state', on ? '✓ Added · tap to remove' : 'Tap to add'));
+      var nm = el('span', 'name'); nm.append(icon(n), n);
+      b.append(nm, el('span', 'state', on ? '✓ added' : 'add'));
       row.append(b);
       if (editing) {
         var x = el('button', 'btn', 'Delete'); x.type = 'button'; x.dataset.del = n;
@@ -318,12 +361,12 @@ h1 span { color: var(--muted); font-weight: 400; }
       box.append(row);
     });
     $('periodBtn').setAttribute('aria-pressed', !!entry.p);
-    $('periodState').textContent = entry.p ? '✓ Marked · tap to remove' : 'Tap to mark';
+    $('periodState').textContent = entry.p ? '✓ marked' : 'mark';
     $('editList').textContent = editing ? 'Finish editing' : 'Edit list';
     $('editList').hidden = !state.types.length;
   }
 
-  function touch() { state.sample = false; save(); render(); }
+  function touch() { state.sample = false; save(); render(); refreshExport(); }
   function entryFor(k) { return state.days[k] || (state.days[k] = { w: [] }); }
   function prune(k) { var e = state.days[k]; if (e && !(e.w && e.w.length) && !e.note && !e.p) delete state.days[k]; }
 
@@ -383,8 +426,9 @@ h1 span { color: var(--muted); font-weight: 400; }
   // Export: one CSV row per logged day.
   var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   function csvCell(v) { v = String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
-  function buildCsv() {
-    var keys = Object.keys(state.days).sort(), rows = [['date', 'weekday', 'exercises', 'note', 'period']];
+  function buildCsv(from, to) {
+    var keys = Object.keys(state.days).filter(function (k) { return k >= from && k <= to; }).sort();
+    var rows = [['date', 'weekday', 'exercises', 'note', 'period']];
     keys.forEach(function (k) {
       var e = state.days[k], p = k.split('-');
       rows.push([k, WEEKDAYS[new Date(+p[0], +p[1] - 1, +p[2]).getDay()], (e.w || []).join('; '), e.note || '', e.p ? 'yes' : 'no']);
@@ -396,10 +440,39 @@ h1 span { color: var(--muted); font-weight: 400; }
     a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
   }
+
+  // Date range: a preset fills the two date fields; editing a date switches to "Custom dates".
+  function presetRange(v) {
+    var t = new Date(), y = t.getFullYear(), m = t.getMonth(), d = t.getDate(), a, b;
+    if (v === 'week') { var off = (t.getDay() + 6) % 7; a = new Date(y, m, d - off); b = new Date(y, m, d - off + 6); }
+    else if (v === 'month') { a = new Date(y, m, 1); b = new Date(y, m + 1, 0); }
+    else if (v === 'year') { a = new Date(y, 0, 1); b = new Date(y, 11, 31); }
+    else if (v === 'lastyear') { a = new Date(y - 1, 0, 1); b = new Date(y - 1, 11, 31); }
+    else if (v === 'all') { var ks = Object.keys(state.days).sort(); return ks.length ? [ks[0], ks[ks.length - 1]] : [keyOf(t), keyOf(t)]; }
+    else return null;
+    return [keyOf(a), keyOf(b)];
+  }
+  // Returns the chosen range with its CSV, or null (with a message shown) when the dates are not usable.
+  function refreshExport() {
+    var r = presetRange($('range').value), msg = $('exportMsg');
+    if (r) { $('from').value = r[0]; $('to').value = r[1]; }
+    var from = $('from').value, to = $('to').value;
+    if (!from || !to) { msg.textContent = 'Choose a start and an end date.'; return null; }
+    if (from > to) { msg.textContent = 'The start date is after the end date.'; return null; }
+    var csv = buildCsv(from, to);
+    msg.textContent = csv.count + (csv.count === 1 ? ' logged day' : ' logged days') + ' in this range.';
+    return { from: from, to: to, csv: csv };
+  }
+  $('range').addEventListener('change', refreshExport);
+  ['from', 'to'].forEach(function (id) {
+    $(id).addEventListener('change', function () { $('range').value = 'custom'; refreshExport(); });
+  });
   $('exportBtn').addEventListener('click', function () {
-    var csv = buildCsv(), msg = $('exportMsg');
-    if (!csv.count) { msg.textContent = 'Nothing to export yet. Log a day first.'; return; }
-    var name = 'workout-calendar-' + keyOf(new Date()) + '.csv';
+    var r = refreshExport(), msg = $('exportMsg');
+    if (!r) return;
+    var csv = r.csv;
+    if (!csv.count) { msg.textContent = 'No logged days in this range, so there is nothing to export.'; return; }
+    var name = 'workout-calendar-' + r.from + '_to_' + r.to + '.csv';
     var done = function () { msg.textContent = 'Exported ' + csv.count + (csv.count === 1 ? ' day' : ' days') + ' as ' + name + '.'; };
     var file = null;
     try { file = new File([csv.text], name, { type: 'text/csv' }); } catch (e) {}
@@ -425,6 +498,7 @@ h1 span { color: var(--muted); font-weight: 400; }
   $('clearSample').addEventListener('click', function () { state.days = {}; touch(); });
 
   render();
+  refreshExport();
 })();
 </script>
 <script>
