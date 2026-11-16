@@ -1,6 +1,6 @@
 // Offline support: keep a copy of the app on the device.
 // Bump VERSION whenever a file changes so phones pick up the new copy.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'workout-calendar-' + VERSION;
 const FILES = [
   './',

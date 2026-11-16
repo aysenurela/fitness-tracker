@@ -27,7 +27,7 @@ html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
   --muted: #8d8894;
   --line: #e2dfe6;
   --cell: #ffffff;
-  --cell-off: #f1eff3;      /* weekends and days outside the month */
+  --cell-off: #f1eff3;      /* days outside the month */
   --today: #dce8ff;
   --today-ring: #5b8def;
   --surface: #ffffff;
@@ -261,8 +261,8 @@ h1 span { color: var(--muted); font-weight: 400; }
 
     for (var i = 0; i < total; i++) {
       var dt = new Date(view.y, view.m, 1 - lead + i), k = keyOf(dt), entry = state.days[k];
-      var inMonth = dt.getMonth() === view.m, wd = dt.getDay();
-      var b = el('button', 'day' + (inMonth ? '' : ' out') + (!inMonth || wd === 0 || wd === 6 ? ' off' : '') + (k === todayKey ? ' today' : ''));
+      var inMonth = dt.getMonth() === view.m;
+      var b = el('button', 'day' + (inMonth ? '' : ' out') + (inMonth ? '' : ' off') + (k === todayKey ? ' today' : ''));
       b.dataset.key = k;
       b.append(el('span', 'num', dt.getDate()));
       var label = dt.toDateString();
